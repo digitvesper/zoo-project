@@ -17,6 +17,7 @@
 # которые могут иметь специфические методы (например, `feed_animal()` для `ZooKeeper`
 # и `heal_animal()` для `Veterinarian`).
 
+import pickle
 
 class Animal:
     def __init__(self, name, age):
@@ -74,9 +75,25 @@ class Zoo:
     def add_animal(self, animal):
         self.animals.append(animal)
 
+    def display_info(self):
+        print("Животные в зоопарке:")
+        for animal in self.animals:
+            print(f"Тип: {type(animal).__name__}, Имя: {animal.name}, Возраст: {animal.age}")
+        print("\nСотрудники зоопарка:")
+        for staff_member in self.staff:
+            print(f"Имя: {staff_member.name}, Должность: {type(staff_member).__name__}")
+
     def add_staff(self, staff):
         self.staff.append(staff)
 
+    def save_zoo(self, filename):
+        with open(filename, 'wb') as file:
+            pickle.dump(self, file)
+
+    @staticmethod
+    def load_zoo(filename):
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
 
 class ZooKeeper:
     def __init__(self, name):
@@ -123,6 +140,14 @@ vet = Veterinarian("Alice")
 zoo.add_staff(keeper)
 zoo.add_staff(vet)
 
+zoo.display_info()
 # Выполнение действий с сотрудниками
 print(keeper.feed_animal(bird))
 print(vet.heal_animal(mammal))
+
+# Сохраняем состояние зоопарка в файл
+zoo.save_zoo("zoo_state.pickle")
+
+# Загружаем состояние зоопарка из файла
+loaded_zoo = Zoo.load_zoo("zoo_state.pickle")
+loaded_zoo.display_info()
